@@ -26,13 +26,6 @@ jobs:
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
 
-      - name: Create app directory on EC2
-        run: |
-          ssh ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} "
-            sudo mkdir -p /var/www/app &&
-            sudo chown -R ${{ secrets.EC2_USER }}:${{ secrets.EC2_USER }} /var/www/app
-          "
-
       - name: Deploy
         run: |
           rsync -avz ./ ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/var/www/app/
