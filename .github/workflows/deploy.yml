@@ -12,5 +12,5 @@ jobs:
       - uses: actions/checkout@v6
       - name: Debug
         run: |
-         echo "USER: ${{ secrets.EC2_USER }}"
+         echo "USER: ${{ secrets.EC2_NAME }}"
          echo "HOST: ${{ secrets.EC2_HOST }}"
