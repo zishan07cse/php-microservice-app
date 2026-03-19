@@ -11,28 +11,8 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: '8.2'
-
-      - name: Install deps
-        run: composer install
-
-      - name: Setup SSH
+      - name: Debug
         run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
-
-      - name: Deploy
-        run: |
-          rsync -avz ./ ${{ secrets.EC2_NAME }}@${{ secrets.EC2_HOST }}:/var/www/app/
-
-      - name: Restart services
-        run: |
-          ssh ${{ secrets.EC2_NAME }}@${{ secrets.EC2_HOST }} "
-            sudo systemctl restart nginx &&
-            sudo systemctl restart php8.2-fpm
+         echo "USER: ${{ secrets.EC2_USER }}"
+         echo "HOST: ${{ secrets.EC2_HOST }}"tl restart php8.2-fpm
           "
