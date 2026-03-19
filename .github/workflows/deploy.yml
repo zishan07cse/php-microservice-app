@@ -22,13 +22,13 @@ jobs:
       - name: SSH setup
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/id_rsa
+          echo "${{ secrets.EC2_SECRATE }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
 
       - name: Deploy
         run: |
-          rsync -avz ./ ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/var/www/app/
+          rsync -avz ./ ${{ secrets.EC2_NAME }}@${{ secrets.EC2_HOST }}:/var/www/app/
 
       - name: Restart
         run: |
