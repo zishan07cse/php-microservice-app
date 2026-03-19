@@ -13,6 +13,6 @@ jobs:
       - name: Debug
         run: |
          echo "USER: ${{ secrets.EC2_USER }}"
-         echo "HOST: ${{ secrets.EC2_HOST }}"tl restart php8.2-fpm
+         echo "HOST: ${{ secrets.EC2_HOST }}"
           "
           
