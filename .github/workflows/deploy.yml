@@ -14,5 +14,3 @@ jobs:
         run: |
          echo "USER: ${{ secrets.EC2_USER }}"
          echo "HOST: ${{ secrets.EC2_HOST }}"
-          "
-          
