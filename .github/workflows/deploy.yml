@@ -2,7 +2,7 @@ name: Deploy
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
 
 jobs:
   deploy:
@@ -10,7 +10,29 @@ jobs:
 
     steps:
       - uses: actions/checkout@v6
-      - name: Debug
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+
+      - name: Install dependencies
+        run: composer install --no-interaction --prefer-dist --optimize-autoloader
+
+      - name: Setup SSH
         run: |
-         echo "USER: ${{ secrets.EC2_NAME }}"
-         echo "HOST: ${{ secrets.EC2_HOST }}"
+          mkdir -p ~/.ssh
+          echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Deploy to EC2
+        run: |
+          rsync -avz --delete -e "ssh -i ~/.ssh/id_rsa" ./ ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/var/www/app/
+
+      - name: Restart services
+        run: |
+          ssh -i ~/.ssh/id_rsa ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
+            sudo systemctl restart nginx
+            sudo systemctl restart php8.2-fpm
+          EOF
