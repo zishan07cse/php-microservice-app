@@ -2,7 +2,7 @@ name: Deploy
 
 on:
   push:
-    branches: ["main"]
+    branches: [ "main" ]
 
 jobs:
   deploy:
@@ -16,23 +16,29 @@ jobs:
         with:
           php-version: '8.2'
 
-      - name: Install dependencies
-        run: composer install --no-interaction --prefer-dist --optimize-autoloader
+      - name: Install deps
+        run: composer install
 
-      - name: Setup SSH
+      - name: SSH setup
         run: |
           mkdir -p ~/.ssh
           echo "${{ secrets.EC2_SECRATE }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
+	  - name: Create app directory on EC2
+	    run: |
+		  ssh ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} "
+		  sudo mkdir -p /var/www/app &&
+		  sudo chown -R ${{ secrets.EC2_USER }}:${{ secrets.EC2_USER }} /var/www/app
+		  "	  
 
       - name: Deploy
         run: |
-          rsync -avz -e "ssh -i ~/.ssh/id_rsa" ./ ${{ secrets.EC2_NAME }}@${{ secrets.EC2_HOST }}:/var/www/app/
+          rsync -avz ./ ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/var/www/app/
 
-      - name: Restart services
+      - name: Restart
         run: |
-          ssh -i ~/.ssh/id_rsa ${{ secrets.EC2_NAME }}@${{ secrets.EC2_HOST }} << 'EOF'
+          ssh ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} "
             sudo systemctl restart nginx
             sudo systemctl restart php8.2-fpm
-          EOF
+          "
