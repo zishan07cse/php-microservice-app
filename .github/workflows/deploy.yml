@@ -10,7 +10,6 @@ jobs:
 
     steps:
       - uses: actions/checkout@v6
-
       - name: Debug
         run: |
          echo "USER: ${{ secrets.EC2_USER }}"
